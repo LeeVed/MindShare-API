@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "users",
     "courses",
+    "django_filters",
 ]
 
 MIDDLEWARE = [
@@ -60,6 +61,10 @@ print(f"PASSWORD: {'*' * len(os.getenv('PASSWORD', '')) if os.getenv('PASSWORD')
 print(f"HOST: {os.getenv('HOST')}")
 print(f"PORT: {os.getenv('PORT')}")
 print("=============================")
+
+REST_FRAMEWORK = {
+    "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"]
+}
 
 DATABASES = {
     'default': {
