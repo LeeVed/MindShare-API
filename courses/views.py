@@ -11,7 +11,10 @@ from rest_framework.views import APIView
 
 
 class CourseViewSet(ModelViewSet):
-    """Представление для курса"""
+    """Представление для списка курсов
+      (промотр всего списка, промотр 1 курса, создание курса,
+       редакция курса, удаление курса
+    """
 
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
@@ -70,7 +73,9 @@ class LessonListCreateAPIView(generics.ListCreateAPIView):
 
 
 class LessonRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
-    """Представление для каждого урока"""
+    """Представление для каждого урока
+      (просмотр,редакция и удаление урока)
+    """
 
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
