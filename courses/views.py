@@ -8,6 +8,7 @@ from rest_framework import generics
 from users.permissions import IsSuperUser, IsOwner, IsModerator
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
+from .tasks import send_course_update_email
 
 
 class CourseViewSet(ModelViewSet):
@@ -44,7 +45,8 @@ class CourseViewSet(ModelViewSet):
         return [IsAuthenticated()]
 
     def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+        course = serializer.save()
+        send_course_update_email.delay(course.id)
 
 
 class LessonListCreateAPIView(generics.ListCreateAPIView):
