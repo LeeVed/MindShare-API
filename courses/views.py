@@ -45,6 +45,9 @@ class CourseViewSet(ModelViewSet):
         return [IsAuthenticated()]
 
     def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+    def perform_update(self, serializer):
         course = serializer.save()
         send_course_update_email.delay(course.id)
 
