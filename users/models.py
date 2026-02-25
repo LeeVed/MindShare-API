@@ -103,7 +103,7 @@ class Payment(models.Model):
 
         constraints = [
             models.CheckConstraint(
-                condition=(
+                check=(
                         models.Q(paid_course__isnull=False, paid_lesson__isnull=True) |
                         models.Q(paid_course__isnull=True, paid_lesson__isnull=False)
                 ),
