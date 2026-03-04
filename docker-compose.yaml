@@ -1,0 +1,118 @@
+# версия формата файла Compose
+version: "3.8"
+# описание сервисов
+services:
+  # Сервис базы данных (PostgreSQL)
+  db:
+    image: postgres:16
+    container_name: mindshare-db
+    # берём переменные из файла .env
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${USER}
+      POSTGRES_PASSWORD: ${PASSWORD}
+      POSTGRES_DB: ${NAME}
+    # проброс порта: порт компьютера : порт контейнера
+    ports:
+      - "5432:5432"
+    # том для сохранения данных БД
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    # проверка, что БД готова
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${USER}" ]
+      # проверять каждые 5 секунд
+      interval: 5s
+      # ждать ответа 5 секунд
+      timeout: 5s
+      # 5 попыток, потом считать failed
+      retries: 5
+  # Сервис Redis
+  redis:
+    # лёгкая версия Redis
+    image: redis:7-alpine
+    container_name: mindshare-redis
+    # проброс порта
+    ports:
+      - "6379:6379"  # проброс порта
+    # том для сохранения данных Redis
+    volumes:
+      - redis_data:/data
+    # проверка, что Redis отвечает
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+  #  Сервис Django приложения
+  web:
+    # собрать образ из Dockerfile в текущей папке
+    build: .
+    container_name: mindshare-web
+    # переменные окружения
+    env_file:
+      - .env
+    environment:
+      HOST: db
+      REDIS_URL: redis://redis:6379
+    # доступ к Django через localhost:8000
+    ports:
+      - "8000:8000"
+    # монтируем код для разработки (не копируем, а связываем, чтобы не пересобирать образ при изменениях в коде)
+    volumes:
+      - .:/app  # для разработки
+    # зависимости от других сервисов
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    # команда запуска (многострочная)
+    command: >
+      sh -c "poetry run python manage.py migrate &&
+             poetry run python manage.py runserver 0.0.0.0:8000"
+  # Сервис Celery worker
+  celery:
+    # тот же образ, что и для web
+    build: .
+    container_name: mindshare-celery
+    env_file:
+      - .env
+    environment:
+      HOST: db
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+    # тот же код
+    volumes:
+      - .:/app
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    # запуск Celery
+    command: poetry run celery -A config worker --loglevel=info
+  # Сервис Celery beat
+  celery-beat:
+    build: .
+    container_name: mindshare-celery-beat
+    env_file:
+      - .env
+    environment:
+      HOST: db
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+    volumes:
+      - .:/app
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    # планировщик периодических задач
+    command: poetry run celery -A config beat --loglevel=info
+# тома для хранения данных (для бд и редис)
+volumes:
+  postgres_data:
+  redis_data:
