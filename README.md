@@ -3,7 +3,7 @@
 ## Запуск через Docker
 
 1. Клонируйте репозиторий
-2. `cp .env.example .env` и отредактируйте
+2. `cp .env.sample .env` и отредактируйте
 3. `docker-compose up -d`
 4. Откройте `http://localhost:8000`
 
