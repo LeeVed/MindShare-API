@@ -1,11 +1,10 @@
-from rest_framework import viewsets, status
+from rest_framework import status, viewsets
 from rest_framework.permissions import AllowAny, IsAuthenticated
-
-from .models import Payment, CustomUser
-from .serializers import PaymentSerializer, CustomUserSerializer
-
-from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from .models import CustomUser, Payment
+from .serializers import CustomUserSerializer, PaymentSerializer
 from .services import create_payment_session
 
 
@@ -32,7 +31,7 @@ class CustomUserViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action == "create":  # только регистрация
             return [AllowAny()]
-        return [IsAuthenticated()]   # все остальные CRUD
+        return [IsAuthenticated()]  # все остальные CRUD
 
 
 class StripePaymentView(APIView):
@@ -46,7 +45,7 @@ class StripePaymentView(APIView):
         if not course_id and not lesson_id:
             return Response(
                 {"error": "Укажите course_id или lesson_id"},
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         payment = Payment.objects.create(
@@ -62,8 +61,10 @@ class StripePaymentView(APIView):
 
         checkout_url = create_payment_session(payment, success_url, cancel_url)
 
-        return Response({
-            "checkout_url": checkout_url,
-            "payment_id": payment.id,
-            "message": "Перейдите по ссылке для оплаты"
-        })
+        return Response(
+            {
+                "checkout_url": checkout_url,
+                "payment_id": payment.id,
+                "message": "Перейдите по ссылке для оплаты",
+            }
+        )

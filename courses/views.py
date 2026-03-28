@@ -1,20 +1,22 @@
 from django.shortcuts import get_object_or_404
+from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
+
+from users.permissions import IsModerator, IsOwner, IsSuperUser
+
 from .models import Course, Lesson, Subscription
 from .paginators import CoursePaginator, LessonPaginator
 from .serializers import CourseSerializer, LessonSerializer
-from rest_framework import generics
-from users.permissions import IsSuperUser, IsOwner, IsModerator
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.views import APIView
 from .tasks import send_course_update_email
 
 
 class CourseViewSet(ModelViewSet):
     """Представление для списка курсов
-      (промотр всего списка, промотр 1 курса, создание курса,
-       редакция курса, удаление курса
+    (промотр всего списка, промотр 1 курса, создание курса,
+     редакция курса, удаление курса
     """
 
     queryset = Course.objects.all()
@@ -79,7 +81,7 @@ class LessonListCreateAPIView(generics.ListCreateAPIView):
 
 class LessonRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     """Представление для каждого урока
-      (просмотр,редакция и удаление урока)
+    (просмотр,редакция и удаление урока)
     """
 
     queryset = Lesson.objects.all()

@@ -1,6 +1,7 @@
 from celery import shared_task
-from django.core.mail import send_mail
 from django.conf import settings
+from django.core.mail import send_mail
+
 from .models import Course, Subscription
 
 
@@ -19,7 +20,7 @@ def send_course_update_email(course_id):
     subject = f"Обновление курса: {course.name}"
     message = f"""
     Уважаемый пользователь!
-    Курс "{course.name}" был обновлен. 
+    Курс "{course.name}" был обновлен.
     Зайдите в свой аккаунт, чтобы посмотреть новые материалы.
     Ссылка на курс: {settings.SITE_URL}/courses/{course.id}
 
@@ -35,4 +36,6 @@ def send_course_update_email(course_id):
         fail_silently=True,
     )
 
-    return f"Уведомление отправлено {len(recipient_list)} подписчикам курса {course.name}"
+    return (
+        f"Уведомление отправлено {len(recipient_list)} подписчикам курса {course.name}"
+    )

@@ -1,8 +1,9 @@
+from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 from rest_framework.validators import UniqueValidator
-from django.contrib.auth.password_validation import validate_password
-from .models import Payment, CustomUser
+
+from .models import CustomUser, Payment
 
 
 class PaymentSerializer(serializers.ModelSerializer):
@@ -14,14 +15,11 @@ class PaymentSerializer(serializers.ModelSerializer):
 class CustomUserSerializer(ModelSerializer):
 
     password = serializers.CharField(
-        write_only=True,
-        required=True,
-        validators=[validate_password]
+        write_only=True, required=True, validators=[validate_password]
     )
 
     email = serializers.EmailField(
-        required=True,
-        validators=[UniqueValidator(queryset=CustomUser.objects.all())]
+        required=True, validators=[UniqueValidator(queryset=CustomUser.objects.all())]
     )
 
     class Meta:
@@ -34,6 +32,6 @@ class CustomUserSerializer(ModelSerializer):
             password=validated_data["password"],  # ← create_user хэширует пароль
             phone_number=validated_data.get("phone_number", ""),
             city=validated_data.get("city", ""),
-            avatar=validated_data.get("avatar", None)
+            avatar=validated_data.get("avatar", None),
         )
         return user

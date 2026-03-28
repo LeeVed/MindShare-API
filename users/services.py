@@ -3,6 +3,7 @@ from django.conf import settings
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
+
 def create_stripe_product(name: str, description: str = None) -> str:
     """
     Создаёт продукт в Stripe.
@@ -22,7 +23,10 @@ def create_stripe_product(name: str, description: str = None) -> str:
         print(f"Stripe API error (create_product): {e}")
         raise
 
-def create_stripe_price(amount_rub: float, product_id: str, currency: str = "rub") -> str:
+
+def create_stripe_price(
+    amount_rub: float, product_id: str, currency: str = "rub"
+) -> str:
     """
     Создаёт цену для продукта в Stripe.
     amount_rub - сумма в рублях (будет автоматически переведена в копейки).
@@ -39,6 +43,7 @@ def create_stripe_price(amount_rub: float, product_id: str, currency: str = "rub
         print(f"Stripe API error (create_price): {e}")
         raise
 
+
 def create_checkout_session(price_id: str, success_url: str, cancel_url: str) -> dict:
     """
     Создаёт сессию Checkout в Stripe.
@@ -46,10 +51,12 @@ def create_checkout_session(price_id: str, success_url: str, cancel_url: str) ->
     """
     try:
         session = stripe.checkout.Session.create(
-            line_items=[{
-                "price": price_id,
-                "quantity": 1,
-            }],
+            line_items=[
+                {
+                    "price": price_id,
+                    "quantity": 1,
+                }
+            ],
             mode="payment",
             success_url=success_url,
             cancel_url=cancel_url,
@@ -58,6 +65,7 @@ def create_checkout_session(price_id: str, success_url: str, cancel_url: str) ->
     except stripe.error.StripeError as e:
         print(f"Stripe API error (create_session): {e}")
         raise
+
 
 def create_payment_session(payment, success_url: str, cancel_url: str) -> str:
     """

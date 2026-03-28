@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
+
 from courses.models import Course, Lesson, Subscription
 from courses.validators import validate_video_link
 
@@ -29,7 +30,9 @@ class CourseSerializer(ModelSerializer):
     def get_is_subscribed(self, course):
         """Проверяет, подписан ли текущий пользователь на курс"""
 
-        user = self.context.get("request").user  # какой пользователь сделал запрос к API
+        user = self.context.get(
+            "request"
+        ).user  # какой пользователь сделал запрос к API
         if user.is_authenticated:
             return Subscription.objects.filter(user=user, course=course).exists()
         return False

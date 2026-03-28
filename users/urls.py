@@ -1,12 +1,8 @@
-from django.urls import path, include
+from django.urls import include, path
 from rest_framework.routers import SimpleRouter
-from .views import PaymentViewSet, CustomUserViewSet
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-)
-from .views import PaymentViewSet, CustomUserViewSet, StripePaymentView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
+from .views import CustomUserViewSet, PaymentViewSet, StripePaymentView
 
 app_name = "users"
 
