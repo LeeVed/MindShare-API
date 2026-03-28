@@ -50,6 +50,8 @@ jobs:
         run: poetry install --no-interaction --no-root
 
       - name: Run tests
+        env:
+          SECRET_KEY: "django-insecure-temporary-key-for-ci"
         run: poetry run python manage.py test
   # сборка докер-образа
   build:
