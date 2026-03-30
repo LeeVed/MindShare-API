@@ -85,7 +85,7 @@ jobs:
 
       - name: Deploy to server
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << "EOF"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP_NEW }} << "EOF"
           docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/mindshare-api:${{ github.sha }}                                         
           docker stop mindshare-api || true
           docker rm mindshare-api || true
