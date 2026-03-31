@@ -88,7 +88,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP_FINAL }} << "EOF"
           docker pull ${{ secrets.DOCKER_HUB_USERNAME }}/mindshare-api:${{ github.sha }}                                         
           docker rm -f mindshare-api || true
-          sleep 2
+          while docker ps -a | grep -q mindshare-api; do sleep 1; done
           docker run -d --name mindshare-api \
             -p 80:8000 \
             -e USE_SQLITE=True \
