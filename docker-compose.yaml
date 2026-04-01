@@ -70,8 +70,8 @@ services:
         condition: service_healthy
     # команда запуска (многострочная)
     command: >
-      sh -c "poetry run python manage.py migrate &&
-             poetry run python manage.py runserver 0.0.0.0:8000"
+      sh -c "python manage.py migrate &&
+               python manage.py runserver 0.0.0.0:8000"
   # Сервис Celery worker
   celery:
     # тот же образ, что и для web

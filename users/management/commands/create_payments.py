@@ -1,7 +1,9 @@
-from django.core.management.base import BaseCommand
-from users.models import Payment, CustomUser
-from courses.models import Course, Lesson
 from decimal import Decimal
+
+from django.core.management.base import BaseCommand
+
+from courses.models import Course, Lesson
+from users.models import CustomUser, Payment
 
 
 class Command(BaseCommand):
@@ -14,7 +16,7 @@ class Command(BaseCommand):
             defaults={
                 "phone_number": "+79991234567",
                 "city": "Москва",
-            }
+            },
         )
         if created:
             user.set_password("testpass123")
@@ -29,7 +31,9 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.ERROR("Сначала создайте курсы и уроки!"))
                 return
         except Exception as e:
-            self.stdout.write(self.style.ERROR(f"Ошибка при получении курса/урока: {e}"))
+            self.stdout.write(
+                self.style.ERROR(f"Ошибка при получении курса/урока: {e}")
+            )
             return
 
         payments_data = [
@@ -60,7 +64,7 @@ class Command(BaseCommand):
                 "paid_lesson": lesson,
                 "amount": Decimal("2500.00"),
                 "payment_option": "cash",
-            }
+            },
         ]
 
         created_count = 0
@@ -70,7 +74,7 @@ class Command(BaseCommand):
                 paid_course=data["paid_course"],
                 paid_lesson=data["paid_lesson"],
                 amount=data["amount"],
-                payment_option=data["payment_option"]
+                payment_option=data["payment_option"],
             )
             if created:
                 created_count += 1
@@ -79,5 +83,7 @@ class Command(BaseCommand):
                 self.stdout.write(f"Платеж уже существует: {payment}")
 
         self.stdout.write(
-            self.style.SUCCESS(f"Успешно создано {created_count} платежей из {len(payments_data)}")
+            self.style.SUCCESS(
+                f"Успешно создано {created_count} платежей из {len(payments_data)}"
+            )
         )

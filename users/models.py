@@ -25,9 +25,13 @@ class CustomUser(AbstractUser):
     username = None
 
     email = models.EmailField(verbose_name="почта", unique=True)
-    phone_number = models.CharField(verbose_name="номер телефона", max_length=15, blank=True, null=True)
+    phone_number = models.CharField(
+        verbose_name="номер телефона", max_length=15, blank=True, null=True
+    )
     city = models.CharField(verbose_name="город", max_length=50, blank=True, null=True)
-    avatar = models.ImageField(verbose_name="аватар", upload_to='users/avatars/', blank=True, null=True)
+    avatar = models.ImageField(
+        verbose_name="аватар", upload_to="users/avatars/", blank=True, null=True
+    )
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
@@ -58,12 +62,10 @@ class Payment(models.Model):
         on_delete=models.CASCADE,
         verbose_name="Пользователь",
         help_text="Выберите пользователя",
-        related_name="payments"
+        related_name="payments",
     )
     payment_date = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name="Дата оплаты",
-        help_text="Дата и время платежа"
+        auto_now_add=True, verbose_name="Дата оплаты", help_text="Дата и время платежа"
     )
     paid_course = models.ForeignKey(
         "courses.Course",
@@ -72,28 +74,28 @@ class Payment(models.Model):
         blank=True,
         verbose_name="Оплаченный курс",
         help_text="Выберите оплаченный курс",
-        related_name="payments"
+        related_name="payments",
     )
     paid_lesson = models.ForeignKey(
-        "courses.Lesson",     # приложение и модель
+        "courses.Lesson",  # приложение и модель
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         verbose_name="Оплаченный урок",
         help_text="Выберите оплаченный урок",
-        related_name="payments"
+        related_name="payments",
     )
     amount = models.DecimalField(
         max_digits=10,
         decimal_places=2,
         verbose_name="Сумма оплаты",
-        help_text="Введите сумму оплаты"
+        help_text="Введите сумму оплаты",
     )
     payment_option = models.CharField(
         max_length=20,
         choices=PAYMENT_OPTIONS,
         verbose_name="Способ оплаты",
-        help_text="Выберите способ оплаты"
+        help_text="Выберите способ оплаты",
     )
 
     class Meta:
@@ -104,10 +106,10 @@ class Payment(models.Model):
         constraints = [
             models.CheckConstraint(
                 check=(
-                        models.Q(paid_course__isnull=False, paid_lesson__isnull=True) |
-                        models.Q(paid_course__isnull=True, paid_lesson__isnull=False)
+                    models.Q(paid_course__isnull=False, paid_lesson__isnull=True) |
+                    models.Q(paid_course__isnull=True, paid_lesson__isnull=False)
                 ),
-                name="only_course_or_lesson"
+                name="only_course_or_lesson",
             )
         ]
 
@@ -117,4 +119,4 @@ class Payment(models.Model):
         elif self.paid_lesson:
             return f"{self.user.email} - {self.paid_lesson.name} - {self.amount} руб."
         else:
-            return f"{self.user.email} - {self.amount} руб." # защита от непредвиденной ситуации(промежуточное состояние)
+            return f"{self.user.email} - {self.amount} руб."  # защита от непредвиденной ситуации

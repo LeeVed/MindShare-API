@@ -1,7 +1,7 @@
-from django.core.management.base import BaseCommand
+from django.apps import apps
 from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
-from django.apps import apps
+from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):
@@ -19,7 +19,12 @@ class Command(BaseCommand):
 
         permissions = Permission.objects.filter(
             content_type__in=[course_ct, lesson_ct],
-            codename__in=["view_course", "change_course", "view_lesson", "change_lesson"]
+            codename__in=[
+                "view_course",
+                "change_course",
+                "view_lesson",
+                "change_lesson",
+            ],
         )
 
         group.permissions.set(permissions)

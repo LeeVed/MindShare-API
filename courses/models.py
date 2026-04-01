@@ -1,4 +1,5 @@
 from django.db import models
+
 from config import settings
 
 
@@ -8,7 +9,7 @@ class Course(models.Model):
     name = models.CharField(
         max_length=200,
         verbose_name="Название курса",
-        help_text="Введите название курса"
+        help_text="Введите название курса",
     )
     preview = models.ImageField(
         upload_to="course_previews/",
@@ -21,7 +22,7 @@ class Course(models.Model):
         blank=True,
         null=True,
         verbose_name="Описание курса",
-        help_text="Напишите о курсе"
+        help_text="Напишите о курсе",
     )
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -46,13 +47,10 @@ class Lesson(models.Model):
     name = models.CharField(
         max_length=200,
         verbose_name="Название урока",
-        help_text="Введите название урока"
+        help_text="Введите название урока",
     )
     description = models.TextField(
-        blank=True,
-        null=True,
-        verbose_name="Описание урока",
-        help_text="Опишите урок"
+        blank=True, null=True, verbose_name="Описание урока", help_text="Опишите урок"
     )
     preview = models.ImageField(
         upload_to="lesson_previews/",
@@ -91,7 +89,7 @@ class Lesson(models.Model):
         return self.name
 
 
-class  Subscription(models.Model):
+class Subscription(models.Model):
     """Модель подписки на обновления курса для пользователя"""
 
     user = models.ForeignKey(
@@ -106,10 +104,7 @@ class  Subscription(models.Model):
         verbose_name="Курс",
         related_name="subscriptions",
     )
-    created_at = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name="Дата подписки"
-    )
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата подписки")
 
     class Meta:
         verbose_name = "Подписка"

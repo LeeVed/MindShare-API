@@ -1,6 +1,7 @@
-from rest_framework.test import APITestCase
-from rest_framework import status
 from django.contrib.auth.models import Group
+from rest_framework import status
+from rest_framework.test import APITestCase
+
 from courses.models import Course, Lesson, Subscription
 from users.models import CustomUser
 
@@ -14,28 +15,22 @@ class LessonTestCase(APITestCase):
         self.moderator_group = Group.objects.create(name="moderators")
 
         self.owner_user = CustomUser.objects.create_user(
-            email="owner@test.com",
-            password="testpass123",
-            is_active=True
+            email="owner@test.com", password="testpass123", is_active=True
         )
 
         self.moderator_user = CustomUser.objects.create_user(
-            email="moderator@test.com",
-            password="testpass123",
-            is_active=True
+            email="moderator@test.com", password="testpass123", is_active=True
         )
         self.moderator_user.groups.add(self.moderator_group)
 
         self.other_user = CustomUser.objects.create_user(
-            email="other@test.com",
-            password="testpass123",
-            is_active=True
+            email="other@test.com", password="testpass123", is_active=True
         )
 
         self.course = Course.objects.create(
             name="Тестовый курс",
             description="Описание тестового курса",
-            owner=self.owner_user
+            owner=self.owner_user,
         )
 
         self.lesson = Lesson.objects.create(
@@ -43,7 +38,7 @@ class LessonTestCase(APITestCase):
             description="Описание тестового урока",
             video_link="https://youtube.com/watch?v=123",
             course=self.course,
-            owner=self.owner_user
+            owner=self.owner_user,
         )
 
         self.lesson_list_url = "/courses/lessons/"
@@ -58,7 +53,7 @@ class LessonTestCase(APITestCase):
             "name": "Новый урок",
             "description": "Описание нового урока",
             "video_link": "https://youtube.com/watch?v=456",
-            "course": self.course.id
+            "course": self.course.id,
         }
 
         response = self.client.post(self.lesson_list_url, data)
@@ -73,7 +68,7 @@ class LessonTestCase(APITestCase):
             "name": "Новый урок",
             "description": "Описание нового урока",
             "video_link": "https://youtube.com/watch?v=456",
-            "course": self.course.id
+            "course": self.course.id,
         }
 
         response = self.client.post(self.lesson_list_url, data)
@@ -88,7 +83,7 @@ class LessonTestCase(APITestCase):
             "name": "Новый урок",
             "description": "Описание нового урока",
             "video_link": "https://youtube.com/watch?v=456",
-            "course": self.course.id
+            "course": self.course.id,
         }
 
         response = self.client.post(self.lesson_list_url, data)
@@ -179,7 +174,7 @@ class LessonTestCase(APITestCase):
         data = {
             "name": "Урок с плохой ссылкой",
             "video_link": "https://vimeo.com/123",
-            "course": self.course.id
+            "course": self.course.id,
         }
 
         response = self.client.post(self.lesson_list_url, data)
@@ -193,21 +188,15 @@ class SubscriptionTestCase(APITestCase):
         """Создаем тестовые данные"""
 
         self.user1 = CustomUser.objects.create_user(
-            email="user1@test.com",
-            password="testpass123",
-            is_active=True
+            email="user1@test.com", password="testpass123", is_active=True
         )
 
         self.user2 = CustomUser.objects.create_user(
-            email="user2@test.com",
-            password="testpass123",
-            is_active=True
+            email="user2@test.com", password="testpass123", is_active=True
         )
 
         self.course = Course.objects.create(
-            name="Тестовый курс для подписок",
-            description="Описание",
-            owner=self.user1
+            name="Тестовый курс для подписок", description="Описание", owner=self.user1
         )
 
         self.subscription_url = "/courses/subscriptions/"
@@ -217,15 +206,14 @@ class SubscriptionTestCase(APITestCase):
 
         self.client.force_authenticate(user=self.user2)
 
-        data = {'course_id': self.course.id}
+        data = {"course_id": self.course.id}
         response = self.client.post(self.subscription_url, data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["message"], "подписка добавлена")
-        self.assertTrue(Subscription.objects.filter(
-            user=self.user2,
-            course=self.course
-        ).exists())
+        self.assertTrue(
+            Subscription.objects.filter(user=self.user2, course=self.course).exists()
+        )
 
     def test_unsubscribe_from_course(self):
         """Тест отписки от курса"""
@@ -233,15 +221,14 @@ class SubscriptionTestCase(APITestCase):
         Subscription.objects.create(user=self.user2, course=self.course)
 
         self.client.force_authenticate(user=self.user2)
-        data = {'course_id': self.course.id}
+        data = {"course_id": self.course.id}
         response = self.client.post(self.subscription_url, data)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["message"], "подписка удалена")
-        self.assertFalse(Subscription.objects.filter(
-            user=self.user2,
-            course=self.course
-        ).exists())
+        self.assertFalse(
+            Subscription.objects.filter(user=self.user2, course=self.course).exists()
+        )
 
     def test_subscribe_unauthenticated(self):
         """Тест подписки неавторизованным пользователем"""
@@ -284,28 +271,20 @@ class CoursePermissionsTestCase(APITestCase):
         self.moderator_group = Group.objects.create(name="moderators")
 
         self.owner_user = CustomUser.objects.create_user(
-            email="owner@test.com",
-            password="testpass123",
-            is_active=True
+            email="owner@test.com", password="testpass123", is_active=True
         )
 
         self.moderator_user = CustomUser.objects.create_user(
-            email="moderator@test.com",
-            password="testpass123",
-            is_active=True
+            email="moderator@test.com", password="testpass123", is_active=True
         )
         self.moderator_user.groups.add(self.moderator_group)
 
         self.other_user = CustomUser.objects.create_user(
-            email="other@test.com",
-            password="testpass123",
-            is_active=True
+            email="other@test.com", password="testpass123", is_active=True
         )
 
         self.course = Course.objects.create(
-            name="Тестовый курс",
-            description="Описание",
-            owner=self.owner_user
+            name="Тестовый курс", description="Описание", owner=self.owner_user
         )
 
         self.course_list_url = "/courses/courses/"
@@ -314,10 +293,7 @@ class CoursePermissionsTestCase(APITestCase):
     def test_course_list_for_owner(self):
         """Тест: владелец видит только свои курсы"""
 
-        Course.objects.create(
-            name="Чужой курс",
-            owner=self.other_user
-        )
+        Course.objects.create(name="Чужой курс", owner=self.other_user)
 
         self.client.force_authenticate(user=self.owner_user)
         response = self.client.get(self.course_list_url)
@@ -329,10 +305,7 @@ class CoursePermissionsTestCase(APITestCase):
     def test_course_list_for_moderator(self):
         """Тест: модератор видит все курсы"""
 
-        Course.objects.create(
-            name="Чужой курс",
-            owner=self.other_user
-        )
+        Course.objects.create(name="Чужой курс", owner=self.other_user)
 
         self.client.force_authenticate(user=self.moderator_user)
         response = self.client.get(self.course_list_url)
